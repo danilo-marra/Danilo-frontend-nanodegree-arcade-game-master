@@ -4,7 +4,7 @@ Jogo Frogger desenvolvido para o primeiro projeto da Udacity utlizando orientaç
 
 ## Como jogar
 
-Utilize as setas do teclado para mover seu personagem e fazer com que ele chegue ate o rio sem que colida com as personagens
+Utilize as setas do teclado para mover seu personagem e fazer com que ele chegue ate o rio sem que colida com os animais
 
 ### Pré-requisitos
 
