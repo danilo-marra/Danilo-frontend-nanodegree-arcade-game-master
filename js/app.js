@@ -1,93 +1,45 @@
-// Enemies our player must avoid
-var Enemy = function(x,y, velocidade) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-    this.x = x;
-    this.y = y;
-    this.velocidade = velocidade;
+'use strict';
 
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
-};
+//Configuracoes Globais
+var config = {
+    "player": {
+           "initial_X": 202.5,
+            "initial_Y": 383,
+            "velocidadeInicial": 50
+     },
+      "board": {
+             "square_width": 402.5,
+      }
+}
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-    this.x += this.velocidade * dt;
-
-    //enimigos realizam loop para esquerda do canvas após chegar ao limite do canvas.width (505)
-    if (this.x >= 505) {
-        this.x = 0;
+//Classe Pai - Personagens
+var Personagem = class Personagem{
+    constructor(x,y, velocidade) {
+        this.x = x;
+        this.y = y;
+        this.velocidade = velocidade;
     }
+}
 
-    // Checa colisão com enimgos ou barreiras
-    checarColisao(this);
-};
-
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
+//Classe Enemy
+var Enemy  =  class Enemy extends Personagem {
+    constructor(xEnemy, yEnemy, velEnemy) {
+        super(xEnemy, yEnemy, velEnemy);
+        this.sprite = 'images/enemy-bug.png';
+    }
+}
 
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
 
 //Classe Player
-var Player = function (x, y, velocidade) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-    this.x = x;
-    this.y = y;
-    this.velocidade = velocidade;
-
-    // The image/sprite for our player, this uses
-    // a helper we've provided to easily load images
-    this.sprite = 'images/char-cat-girl.png';
-};
-
-Player.prototype.update = function() {
+var Player = class Player extends Personagem {
+    constructor(xPlayer, yPlayer, velPlayer) {
+        super(xPlayer, yPlayer, velPlayer);
+        this.sprite = 'images/char-cat-girl.png';
+    }
 }
-
-//Exibir player e o SCORE
-Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    exibeScoreNível(score, gameLevel);
-};
-
-// Função exibe SCORE
-var exibeScoreNível = function(aScore, aLevel) {
-    var canvas = document.getElementsByTagName('canvas');
-    var firstCanvasTag = canvas[0];
-
-    // add player score and level to div element created
-    scoreLevelDiv.innerHTML = 'Pontuação: ' + aScore
-        + ' / ' + 'Nível: ' + aLevel;
-    document.body.insertBefore(scoreLevelDiv, firstCanvasTag[0]);
-};
-
-Player.prototype.handleInput = function (keyPress) {
-    if (keyPress == 'left') {
-        player.x -= player.velocidade; //esquerda
-    }
-
-    if (keyPress == 'up') {
-        player.y -= player.velocidade -20; //cima
-    }
-    if (keyPress == 'right') {
-        player.x += player.velocidade; //direita
-    }
-
-    if (keyPress == 'down') {
-        player.y += player.velocidade -20; //baixo
-    }
-    console.log('keyPress é:' + keyPress);
-};
-
 
 var checarColisao = function(anEnemy) {
     // checa colisão entre enimigo e o player
@@ -98,16 +50,16 @@ var checarColisao = function(anEnemy) {
         && player.x + 76 >= anEnemy.x + 11) {
         console.log('colisão');
         //Reseta posição inicial do player
-        player.x = 202.5;
-        player.y = 383;
+        player.x = config.player.initial_X;
+        player.y = config.player.initial_Y;
     }
 
     // Se chegar ao topo ganha o jogo e adiciona +1 à ponuação e ao nível
     // passa score como argumento para a função aumentaDificuldade
     if (player.y + 63 <= 0) { 
         //Reseta posição inicial do player       
-        player.x = 202.5;
-        player.y = 383;
+        player.x = config.player.initial_X;
+        player.y = config.player.initial_Y;
         console.log('Ganhou!');
 
         ctx.fillStyle = 'white';
@@ -121,15 +73,28 @@ var checarColisao = function(anEnemy) {
     }
 
     // verifica se o player não ultrapassa os limites da tela
-    if (player.y > 383 ) {
-        player.y = 383;
+    if (player.y > config.player.initial_Y ) {
+        player.y = config.player.initial_Y;
     }
-    if (player.x > 402.5) {
-        player.x = 402.5;
+    if (player.x > config.board.square_width) {
+        player.x = config.board.square_width;
     }
+
+    //limite esquerdo
     if (player.x < 2.5) {
         player.x = 2.5;
     }
+};
+
+// Função exibe SCORE
+var exibeScoreNível = function(aScore, aLevel) {
+    var canvas = document.getElementsByTagName('canvas');
+    var firstCanvasTag = canvas[0];
+
+    // add player score and level to div element created
+    scoreLevelDiv.innerHTML = 'Pontuação: ' + aScore
+        + ' / ' + 'Nível: ' + aLevel;
+    document.body.insertBefore(scoreLevelDiv, firstCanvasTag[0]);
 };
 
 // Aumenta o número de inimigos baseado no nível atual
@@ -150,7 +115,7 @@ var aumentaDificuldade = function(numEnemies) {
 // Place the player object in a variable called player
 
 var allEnemies = [];
-var player = new Player(202.5, 383, 50);
+var player = new Player(config.player.initial_X, config.player.initial_Y, config.player.velocidadeInicial);
 var score = 0;
 var gameLevel = 1;
 var scoreLevelDiv = document.createElement('div');
@@ -172,3 +137,53 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+// Update the enemy's position, required method for game
+// Parameter: dt, a time delta between ticks
+Enemy.prototype.update = function(dt) {
+    // You should multiply any movement by the dt parameter
+    // which will ensure the game runs at the same speed for
+    // all computers.
+    this.x += this.velocidade * dt;
+
+    //enimigos realizam loop para esquerda do canvas após chegar ao limite do canvas.width (505)
+    if (this.x >= 505) {
+        this.x = 0;
+    }
+
+    // Checa colisão com enimgos ou barreiras
+    checarColisao(this);
+};
+
+// Draw the enemy on the screen, required method for game
+this.Enemy.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+
+this.Player.prototype.update = function() {
+}
+
+//Exibir player e o SCORE
+this.Player.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    exibeScoreNível(score, gameLevel);
+};
+
+this.Player.prototype.handleInput = function (keyPress) {
+    if (keyPress == 'left') {
+        player.x -= player.velocidade; //esquerda
+    }
+
+    if (keyPress == 'up') {
+        player.y -= player.velocidade -20; //cima
+    }
+    if (keyPress == 'right') {
+        player.x += player.velocidade; //direita
+    }
+
+    if (keyPress == 'down') {
+        player.y += player.velocidade -20; //baixo
+    }
+    console.log('keyPress é:' + keyPress);
+};
