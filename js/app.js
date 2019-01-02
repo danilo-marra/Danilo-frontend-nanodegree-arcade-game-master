@@ -9,6 +9,7 @@ var config = {
      },
       "board": {
              "square_width": 402.5,
+             "canvas_width": 505
       }
 }
 
@@ -37,7 +38,13 @@ var Enemy  =  class Enemy extends Personagem {
 var Player = class Player extends Personagem {
     constructor(xPlayer, yPlayer, velPlayer) {
         super(xPlayer, yPlayer, velPlayer);
-        this.sprite = 'images/char-cat-girl.png';
+        this.sprite = 'images/char-cat-girl.png';/*
+        this.jogador = function () {
+            return this;
+        }; Pesquisar depois: Muito bem! Você implementou uma função para tratar a colisão entre o 
+        player e os inimigos. Isso preserva o encapsulamento das classes, mas caso mude o nome da instância da classe Player de player para jogador,
+        por exemplo, essa função não seria mais executada corretamente. Por isso, a dica do revisor anterior de utilizar this dentro
+        de um método da classe Player ajudaria a tratar isso. */ 
     }
 }
 
@@ -123,8 +130,6 @@ var enemy = new Enemy(0, Math.random() * 184 + 50, Math.random() * 256);
 
 allEnemies.push(enemy);
 
-
-
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', function(e) {
@@ -144,10 +149,11 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
+    this.enemy = enemy;
     this.x += this.velocidade * dt;
 
     //enimigos realizam loop para esquerda do canvas após chegar ao limite do canvas.width (505)
-    if (this.x >= 505) {
+    if (this.x >= config.board.canvas_width) {
         this.x = 0;
     }
 
@@ -160,7 +166,6 @@ this.Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-
 this.Player.prototype.update = function() {
 }
 
@@ -172,18 +177,18 @@ this.Player.prototype.render = function() {
 
 this.Player.prototype.handleInput = function (keyPress) {
     if (keyPress == 'left') {
-        player.x -= player.velocidade; //esquerda
+        this.x -= this.velocidade; //esquerda
     }
 
     if (keyPress == 'up') {
-        player.y -= player.velocidade -20; //cima
+        this.y -= this.velocidade -20; //cima
     }
     if (keyPress == 'right') {
-        player.x += player.velocidade; //direita
+        this.x += this.velocidade; //direita
     }
 
     if (keyPress == 'down') {
-        player.y += player.velocidade -20; //baixo
+        this.y += this.velocidade -20; //baixo
     }
     console.log('keyPress é:' + keyPress);
 };
