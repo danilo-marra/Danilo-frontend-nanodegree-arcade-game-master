@@ -29,6 +29,7 @@ var Enemy  =  class Enemy extends Personagem {
         this.sprite = 'images/enemy-bug.png';
     }
 }
+var enemy = new Enemy(0, Math.random() * 184 + 50, Math.random() * 256);
 
 // Now write your own player class
 // This class requires an update(), render() and
@@ -47,49 +48,20 @@ var Player = class Player extends Personagem {
         de um método da classe Player ajudaria a tratar isso. */ 
     }
 }
+var player = new Player(config.player.initial_X, config.player.initial_Y, config.player.velocidadeInicial);
 
-var checarColisao = function(anEnemy) {
+var checarColisao = function(enemy) {
+
     // checa colisão entre enimigo e o player
     if (
-        player.y + 131 >= anEnemy.y + 90
-        && player.x + 25 <= anEnemy.x + 88
-        && player.y + 73 <= anEnemy.y + 135
-        && player.x + 76 >= anEnemy.x + 11) {
+        player.y + 131 >= enemy.y + 90
+        && player.x + 25 <= enemy.x + 88
+        && player.y + 73 <= enemy.y + 135
+        && player.x + 76 >= enemy.x + 11) {
         console.log('colisão');
         //Reseta posição inicial do player
         player.x = config.player.initial_X;
         player.y = config.player.initial_Y;
-    }
-
-    // Se chegar ao topo ganha o jogo e adiciona +1 à ponuação e ao nível
-    // passa score como argumento para a função aumentaDificuldade
-    if (player.y + 63 <= 0) { 
-        //Reseta posição inicial do player       
-        player.x = config.player.initial_X;
-        player.y = config.player.initial_Y;
-        console.log('Ganhou!');
-
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, 505, 171);
-
-        score += 1;
-        gameLevel += 1;
-        console.log('Pontuação Atual: ' + score + ', Nível Atual: ' + gameLevel);
-        aumentaDificuldade(score);
-
-    }
-
-    // verifica se o player não ultrapassa os limites da tela
-    if (player.y > config.player.initial_Y ) {
-        player.y = config.player.initial_Y;
-    }
-    if (player.x > config.board.square_width) {
-        player.x = config.board.square_width;
-    }
-
-    //limite esquerdo
-    if (player.x < 2.5) {
-        player.x = 2.5;
     }
 };
 
@@ -122,12 +94,9 @@ var aumentaDificuldade = function(numEnemies) {
 // Place the player object in a variable called player
 
 var allEnemies = [];
-var player = new Player(config.player.initial_X, config.player.initial_Y, config.player.velocidadeInicial);
 var score = 0;
 var gameLevel = 1;
 var scoreLevelDiv = document.createElement('div');
-var enemy = new Enemy(0, Math.random() * 184 + 50, Math.random() * 256);
-
 allEnemies.push(enemy);
 
 // This listens for key presses and sends the keys to your
@@ -139,7 +108,6 @@ document.addEventListener('keyup', function(e) {
         39: 'right',
         40: 'down'
     };
-
     player.handleInput(allowedKeys[e.keyCode]);
 });
 
@@ -162,20 +130,51 @@ Enemy.prototype.update = function(dt) {
 };
 
 // Draw the enemy on the screen, required method for game
-this.Enemy.prototype.render = function() {
+Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-this.Player.prototype.update = function() {
+Player.prototype.update = function() {
+    
+    // Se chegar ao topo ganha o jogo e adiciona +1 à ponuação e ao nível
+    // passa score como argumento para a função aumentaDificuldade
+    if (this.y + 63 <= 0) { 
+        //Reseta posição inicial do player       
+        this.x = config.player.initial_X;
+        this.y = config.player.initial_Y;
+        console.log('Ganhou!');
+
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, 505, 171);
+
+        score += 1;
+        gameLevel += 1;
+        console.log('Pontuação Atual: ' + score + ', Nível Atual: ' + gameLevel);
+        aumentaDificuldade(score);
+
+    }
+
+    // verifica se o player não ultrapassa os limites da tela
+    if (this.y > config.player.initial_Y ) {
+        this.y = config.player.initial_Y;
+    }
+    if (this.x > config.board.square_width) {
+        this.x = config.board.square_width;
+    }
+
+    //limite esquerdo
+    if (this.x < 2.5) {
+        this.x = 2.5;
+    }
 }
 
 //Exibir player e o SCORE
-this.Player.prototype.render = function() {
+Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     exibeScoreNível(score, gameLevel);
 };
 
-this.Player.prototype.handleInput = function (keyPress) {
+Player.prototype.handleInput = function (keyPress) {
     if (keyPress == 'left') {
         this.x -= this.velocidade; //esquerda
     }
